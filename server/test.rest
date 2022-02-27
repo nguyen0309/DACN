@@ -1,0 +1,49 @@
+POST http://localhost:3002/api/user/create
+Content-Type: application/json
+
+{
+    "phone": "0939393939",
+    "name": "test 39",
+    "password": "123456789"
+}
+
+###
+POST http://localhost:3002/api/auth/login
+Content-Type: application/json
+
+{
+    "phone": "1234567899",
+    "password": "12345678"
+}
+
+###
+POST http://localhost:3002/api/auth/login
+Content-Type: application/json
+
+{
+    "phone": "012345678",
+    "password": "1234567"
+}
+
+###
+POST http://localhost:3002/api/user/list
+
+### 
+POST http://localhost:3002/api/conversion/create
+Content-Type: application/json
+
+{
+    "members": ["cvbccc", "svdsdv"],
+    "type": "private"
+}
+
+###
+GET http://localhost:3002/api/conversion/list/abc
+
+###
+POST http://localhost:3002/api/message/create
+Content-Type: application/json
+
+{
+    "message": "ahihi"
+}
