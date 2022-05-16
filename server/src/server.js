@@ -107,5 +107,6 @@ const seeder = async (req, res) => {
 
 seeder();
 
+// set port
 const PORT = process.env.PORT || 3003;
 server.listen(PORT, console.log(`Server run on ${PORT}`));
