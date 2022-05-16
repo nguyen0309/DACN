@@ -1,0 +1,16 @@
+{
+    "mode": "inline",
+    "theme": "dark",
+    "data": [
+        {
+            "route": "/task",
+            "label": "Quản lý công việc",
+            "icon": "/image/inbox.svg"
+        },
+        {
+            "route": "/",
+            "label": "Trò chuyện",
+            "icon": "/image/users.svg"
+        }
+    ]
+}

@@ -1,127 +1,68 @@
 <template>
-  <a-layout id="components-layout-demo-custom-trigger">
-    <a-layout-sider v-model="collapsed" :trigger="null" collapsible>
-      <div class="logo" />
-      <a-menu theme="dark" mode="inline" :default-selected-keys="['1']">
-        <a-menu-item key="1">
-          <a-icon type="user" />
-          <span>Quản lý người dùng</span>
-        </a-menu-item>
-      </a-menu>
-    </a-layout-sider>
-    <a-layout>
-      <a-layout-header style="background: #fff; padding: 0">
-        <a-icon
-          class="trigger"
-          style="float: left"
-          :type="collapsed ? 'menu-unfold' : 'menu-fold'"
-          @click="() => (collapsed = !collapsed)"
-        />
-      </a-layout-header>
-      <a-layout-content
-        :style="{
-          margin: '24px 16px',
-          padding: '24px',
-          background: '#fff',
-          minHeight: '280px',
-        }"
-      >
-        <div class="content">
-          <div class="header">
-            <h2>User Management</h2>
-          </div>
-          <div>
-            <a-button class="btn" type="primary" @click="showModal">
-              Add User
-            </a-button>
-            <a-modal v-model="visible" title="Add User" on-ok="handleOk">
-              <template slot="footer">
-                <a-button key="back" @click="handleCancel"> Return </a-button>
-                <a-button
-                  key="submit"
-                  type="primary"
-                  :loading="loading"
-                  @click="handleOk"
-                >
-                  Submit
-                </a-button>
-              </template>
-              <form action="" method="POST">
-                <div class="label">Name</div>
-                <input class="input" type="text" v-model="name" />
-                <div class="label">Phone</div>
-                <input class="input" type="text" v-model="phone" />
-                <div class="label">password</div>
-                <input class="input" type="password" v-model="password" />
-              </form>
+  <layout>
+    <div class="content">
+      <div class="header">
+        <h2>Quản lý người dùng</h2>
+      </div>
+      <div>
+        <a-button class="btn" type="primary" @click="showModal"> Add User </a-button>
+        <a-modal v-model="visible" title="Add User" on-ok="handleOk">
+          <template slot="footer">
+            <a-button key="back" @click="handleCancel"> Return </a-button>
+            <a-button key="submit" type="primary" :loading="loading" @click="handleOk"> Submit </a-button>
+          </template>
+          <form action="" method="POST">
+            <div class="label">Name</div>
+            <input class="input" type="text" v-model="name" />
+            <div class="label">Phone</div>
+            <input class="input" type="text" v-model="phone" />
+            <div class="label">password</div>
+            <input class="input" type="password" v-model="password" />
+          </form>
 
-              <!-- <select class="input"></select> -->
-            </a-modal>
-          </div>
+          <!-- <select class="input"></select> -->
+        </a-modal>
+      </div>
 
-          <div class="ant-table">
-            <a-table
-              :columns="columns"
-              :data-source="users"
-              bordered
-              :pagination="{ pageSize: 6 }"
-            >
-              <template slot="id" slot-scope="id, record, index">
-                {{ index + 1 }}
-              </template>
-              <template slot="operation" slot-scope="text, record">
-                <div class="action">
-                  <button
-                    v-if="record.role != 0"
-                    class="edit"
-                    @click="() => handleUpdate(record._id)"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    v-if="record.role != 0"
-                    class="delete"
-                    @click="deleteClick(record._id)"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </template>
-            </a-table>
-          </div>
+      <div class="ant-table">
+        <a-table :columns="columns" :data-source="users" bordered :pagination="{ pageSize: 6 }">
+          <template slot="id" slot-scope="id, record, index">
+            {{ index + 1 }}
+          </template>
+          <template slot="operation" slot-scope="text, record">
+            <div class="action">
+              <button v-if="record.role != 0" class="edit" @click="() => handleUpdate(record._id)">Edit</button>
+              <button v-if="record.role != 0" class="delete" @click="deleteClick(record._id)">Delete</button>
+            </div>
+          </template>
+        </a-table>
+      </div>
 
-          <div>
-            <a-modal v-model="visibleEdit" title="Edit User" on-ok="handleOk">
-              <template slot="footer">
-                <a-button key="back" @click="handleCancel"> Return </a-button>
-                <a-button
-                  key="submit"
-                  type="primary"
-                  :loading="loading"
-                  @click="handleEditOk"
-                >
-                  Submit
-                </a-button>
-              </template>
-              <form action="" method="POST">
-                <div class="label">Name</div>
-                <input class="input" type="text" v-model="name" />
-                <div class="label">Phone</div>
-                <input class="input" type="text" v-model="phone" />
-                <div class="label">password</div>
-                <input class="input" type="password" v-model="password" />
-              </form>
-            </a-modal>
-          </div>
-        </div>
-      </a-layout-content>
-    </a-layout>
-  </a-layout>
+      <div>
+        <a-modal v-model="visibleEdit" title="Edit User" on-ok="handleOk">
+          <template slot="footer">
+            <a-button key="back" @click="handleCancel"> Return </a-button>
+            <a-button key="submit" type="primary" :loading="loading" @click="handleEditOk"> OK </a-button>
+          </template>
+          <form action="" method="POST">
+            <div class="label">Name</div>
+            <input class="input" type="text" v-model="name" />
+            <div class="label">Phone</div>
+            <input class="input" type="text" v-model="phone" />
+            <div class="label">password</div>
+            <input class="input" type="password" v-model="password" />
+          </form>
+        </a-modal>
+      </div>
+    </div>
+  </layout>
 </template>
 
 <script>
 import axios from "axios";
 import { mapMutations } from "vuex";
+import { mapState } from "vuex";
+import layout from "../layouts/layout.vue";
 const columns = [
   {
     title: "STT",
@@ -172,21 +113,19 @@ export default {
       collapsed: false,
     };
   },
-  // async created() {
-  //   await this.checkToken();
-  // },
+  components: {
+    layout,
+  },
   computed: {
-    // ...mapState(["user"]),
+    ...mapState(["user"]),
   },
   methods: {
     ...mapMutations(["setUser"]),
     async loadData() {
-      await axios
-        .post("http://localhost:3002/api/user/list")
-        .then((response) => {
-          this.users = response.data.data;
-          console.log(this.users);
-        });
+      await axios.post("http://localhost:3002/api/user/list").then((response) => {
+        this.users = response.data.data;
+        console.log(this.users);
+      });
     },
     addClick() {
       this.modalTitle = "Add User";
@@ -237,13 +176,11 @@ export default {
       if (!confirm("Are you sure?")) {
         return;
       }
-      axios
-        .delete("http://localhost:3002/api/user/delete/" + _id)
-        .then((response) => {
-          console.log("res-delete", response);
-          this.loadData();
-          alert("Xoá thành công");
-        });
+      axios.delete("http://localhost:3002/api/user/delete/" + _id).then((response) => {
+        console.log("res-delete", response);
+        this.loadData();
+        alert("Xoá thành công");
+      });
     },
     showModal() {
       this.visible = true;
@@ -289,12 +226,16 @@ export default {
 };
 </script>
 <style scoped>
+.ant-menu-item {
+  text-align: left !important;
+}
 #components-layout-demo-custom-trigger .trigger {
   font-size: 18px;
   line-height: 64px;
   padding: 0 24px;
   cursor: pointer;
   transition: color 0.3s;
+  height: 100%;
 }
 
 #components-layout-demo-custom-trigger .trigger:hover {

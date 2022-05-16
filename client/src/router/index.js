@@ -22,6 +22,11 @@ const routes = [
     component: () => import("../views/Userlist.vue"),
   },
   {
+    path: "/task",
+    name: "Task",
+    component: () => import("../views/Task.vue"),
+  },
+  {
     path: '/:match(.*)*',
     component: Error
   }
