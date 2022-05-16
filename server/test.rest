@@ -12,7 +12,7 @@ POST http://localhost:3002/api/auth/login
 Content-Type: application/json
 
 {
-    "phone": "1234567899",
+    "phone": "0123456789",
     "password": "12345678"
 }
 
@@ -46,4 +46,35 @@ Content-Type: application/json
 
 {
     "message": "ahihi"
+}
+
+###
+POST http://localhost:3002/api/task/create
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyODIxZDUxZTlhNzUzOWIxMjU5YjdjYyIsImlhdCI6MTY1MjY5NjQ0OCwiZXhwIjoxNjU1Mjg4NDQ4fQ.KaQ0qJG96RLpQymmqibIKp_weu3yWZ-Oo4zzVrxX45U
+
+{
+    "name": "ddd",
+    "status": "approved"
+}
+
+### 
+POST http://localhost:3002/api/task/update/6282368c0435f95f24395e76
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyODIxZDUxZTlhNzUzOWIxMjU5YjdjYyIsImlhdCI6MTY1MjY5NjQ0OCwiZXhwIjoxNjU1Mjg4NDQ4fQ.KaQ0qJG96RLpQymmqibIKp_weu3yWZ-Oo4zzVrxX45U
+
+{
+    "estimate_time": 1500,
+    "assign": "62821d51e9a7539b1259b7cc",
+    "status": "inprocess"
+}
+
+### 
+GET http://localhost:3002/api/task/get/6282368c0435f95f24395e76
+
+###
+POST http://localhost:3002/api/task/list
+Content-Type: application/json
+
+{
 }

@@ -9,8 +9,8 @@ const messageSchema = new Schema(
     receiver_id: {type: Schema.Types.ObjectId, ref: "users"},
     message: String,
     type: String,
-    created_time: {type: Number, default: Date.now()},
-    updated_time: {type: Number, default: Date.now()}
+    created_time: {type: Number, default: Date.now },
+    updated_time: {type: Number, default: Date.now }
   },
 );
 
