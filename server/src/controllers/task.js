@@ -9,7 +9,8 @@ class taskCtr {
       data.updated_by = req.user_id;
       await schema.createTask.validateAsync(data);
       let count = await taskModel.countDocuments();
-      data.code = "CV-" + count;
+      let startNumber = Number(count) + 1;
+      data.code = "CV-" + startNumber;
       const rs = await taskModel.create(data);
       return res.send({ success: true, data: rs });
     } catch (error) {
@@ -67,9 +68,8 @@ class taskCtr {
       const { search, sort, skip, limit, filter } = req.body;
       let condition = {};
       taskCtr.mapFilter(condition, search, filter);
-      let arrStatus = condition.status
-        ? condition.status["$in"]
-        : ["todo", "in-process", "need-test", "approved"];
+      console.log("condition", condition);
+      let arrStatus = condition.status ? condition.status["$in"] : ["todo", "in_progress", "ready_to_test", "testing", "approved"];
       let rs = await Promise.all(
         arrStatus.map(async (status) => {
           let cond = { ...condition, status };
@@ -78,8 +78,17 @@ class taskCtr {
             .sort(sort || { created_time: -1 })
             .skip(Number(skip) || 0)
             .limit(Number(limit) || 20);
+
+          let a = await Promise.all(
+            find.map(async (m) => {
+              let findAssign = await userModel.findOne({ _id: m.assign }).select("-password");
+              m._doc.map_assign = findAssign;
+              return m;
+            })
+          );
+
           let count = await taskModel.countDocuments(cond);
-          return { status, list: find, count };
+          return { status, list: a, count };
         })
       );
       return res.send({ success: true, data: rs });
@@ -91,20 +100,25 @@ class taskCtr {
 
   static async mapFilter(condition, search, filter) {
     if (search) {
-      let reg = new RegExp(`.*${search}.*`, i);
-      condition[$or] = {
-        name: reg,
-        code: reg,
-      };
+      let reg = new RegExp(`.*${search}.*`, "i");
+      condition["$or"] = [
+        {
+          name: reg,
+        },
+        { code: reg },
+      ];
     }
     if (!filter) return condition;
     if (filter.assign_to) {
-      condition.assign = filter.assign_to;
+      condition.assign = { $in: filter.assign_to };
     }
     if (filter.status && Array.isArray(filter.status)) {
       condition.status = {
         $in: filter.status,
       };
+    }
+    if (filter.priority) {
+      condition.priority = filter.priority;
     }
     return condition;
   }

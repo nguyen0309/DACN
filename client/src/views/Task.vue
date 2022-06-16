@@ -1,129 +1,251 @@
 <template>
-  <layout>
-    <div class="task-container">
-      <ul class="task-list">
-        <li class="task-column task-column-on-hold">
-          <span class="task-column-header">
-            <h2>Tasks</h2>
-          </span>
-
-          <div class="task-input">
-            <input type="text" placeholder="+ Add an task" @keyup.enter="addIssue('tasks')" v-model="create.tasks" />
+  <layout style="background: #dadceb">
+    <div slot="name-tab">Quản lý công việc</div>
+    <div class="task-header">
+      <div class="box-search">
+        <input
+          type="text"
+          class="search-ip-custom hover-bt"
+          placeholder="Gõ tên người làm hoặc code công việc để tìm kiếm"
+          v-model="search"
+          @keyup="handleSearch"
+        />
+        <img src="../assets/images/search.svg" alt="" />
+      </div>
+      <div class="user-list">
+        <div class="user" v-for="i in users" :key="i._id">
+          <div
+            @click="filterUser(i)"
+            class="avatar"
+            :class="{ avatarborder: user_id.find((u) => u == i._id) }"
+            :style="{ backgroundColor: randomColor(i._id) }"
+          >
+            {{ i.name.charAt(0) }}
+            <div class="user-name">{{ i.name }}</div>
           </div>
-          <ul class="task-inner-list" id="tasks">
-            <li v-for="item in tasks" :key="item.id" class="task-item" @click="openTaskInfo">
-              <taskInfo :task="item" :show="showModal" @hide="openTaskInfo"></taskInfo> 
-              <h1>{{ item.name }}</h1>
-            </li>
-          </ul>
-        </li>
-        <li class="task-column task-column-in-progress">
+        </div>
+      </div>
+      <select
+        style="height: 40px; width: 220px; font-size: 17px; padding-left: 10px; border-radius: 5px"
+        :placeholder="'Độ ưu tiên'"
+        v-model="select"
+        @change="filterPriority"
+      >
+        <option value="" disabled selected>Độ ưu tiên</option>
+        <option v-for="i in prioritys" :key="i.value" :value="i">{{ i.name }}</option>
+      </select>
+    </div>
+    <div class="task-container">
+      <draggable v-model="tasks" class="task-list">
+        <div v-for="item in tasks" :key="item.index" class="task-column task-column-on-hold">
           <span class="task-column-header">
-            <h2>In Progress</h2>
+            <h2>{{ item.name }}</h2>
+            <button v-if="item.status == 'todo'" @click="openAddTaskModal" class="add-task">+ Add Task</button>
           </span>
-          <ul class="task-inner-list" id="inprogress">
-            <li v-for="item in inprogress" :key="item.id" class="task-item">
-              <h1>{{ item.name }}</h1>
-            </li>
-          </ul>
-        </li>
-        <li class="task-column task-column-needs-review">
-          <span class="task-column-header"> <h2>Needs Test</h2> </span>
-          <ul class="task-inner-list" id="review">
-            <li v-for="item in review" :key="item.id" class="task-item">
-              <h1>{{ item.name }}</h1>
-            </li>
-          </ul>
-        </li>
-        <li class="task-column task-column-approved">
-          <span class="task-column-header">
-            <h2>Done</h2>
-          </span>
-          <ul class="task-inner-list" id="approved">
-            <li v-for="item in approved" :key="item.id" class="task-item">
-              <h1>{{ item.name }}</h1>
-            </li>
-          </ul>
-        </li>
-      </ul>
+          <draggable :list="item.list" :group="{ name: 'item' }" class="task-inner-list" @change="log(item, $event)">
+            <div v-for="i in item.list" :key="i.id" class="task-item">
+              <div class="task-action">
+                <div @click="openTaskInfo(i)" :class="{ taskname: true, redtext: i.priority == 'high', yellowtext: i.priority == 'low' }">
+                  {{ i.name }}
+                </div>
+                <div class="action">
+                  <img style="margin-right: 10px" @click="openEditTaskModal(i)" src="../assets/images/edit.svg" alt="" />
+                  <img @click="deleteClick(i._id)" src="../assets/images/delete.svg" alt="" />
+                </div>
+              </div>
+              <div class="task-info">
+                <div>{{ i.code }} - {{ i.estimate_time }}</div>
+                <div class="assigner" :style="{ backgroundColor: randomColor(i.map_assign._id) }">
+                  {{ i.map_assign.name.charAt(0) }}
+                </div>
+              </div>
+            </div>
+          </draggable>
+        </div>
+        <taskInfo :task="info" :show="showModal" @hide="openTaskInfo"></taskInfo>
+        <addTask :users="users" :showModal="showAddModal" @hide="openAddTaskModal"></addTask>
+        <editTask :users="users" :showEdit="showEditModal" :taskObject="taskObject" @hide="openEditTaskModal"></editTask>
+      </draggable>
     </div>
   </layout>
 </template>
 <script>
-import $ from "jquery";
-import dragula from "dragula";
-// import axios from "axios";
+import draggable from "vuedraggable";
+import axios from "axios";
+import { mapMutations } from "vuex";
 import { mapState } from "vuex";
 import layout from "../layouts/layout.vue";
 import taskInfo from "../components/taskInfomation.vue";
+import addTask from "../components/addTask.vue";
+import editTask from "../components/editModal.vue";
+// import dropdownComponent from "../components/dropdown.vue";
 export default {
-  created: onCreate,
+  name: "functional",
+  display: "Functional third party",
+  order: 17,
+  head() {
+    return {
+      title: "Quản lý công việc",
+    };
+  },
   data() {
     return {
       showModal: false,
+      showAddModal: false,
+      showEditModal: false,
       create: {},
-      tasks: [
+      tasks: [],
+      users: [],
+      info: {},
+      status: "",
+      enabled: true,
+      taskObject: {},
+      search: "",
+      filter: {},
+      user_id: [],
+      userid: "",
+      colorCache: {},
+      clickOn: false,
+      priority: "",
+      priorityActive: [],
+      prioritys: [
+        { name: "All", value: "" },
         {
-          name: "New sidebar design",
-          time: "2 days",
-          description: "Design a new sidebar",
+          value: "high",
+          name: "High",
         },
         {
-          name: "Header design featuresHeader design featuresHeader design featuresHeader design features",
-          time: "2 days",
-          description: "Design a new sidebar",
+          value: "normal",
+          name: "Normal",
+        },
+        {
+          value: "low",
+          name: "Low",
         },
       ],
-      inprogress: [],
-      review: [],
-      approved: [],
+      conditions: [],
+      selectOption: {
+        priority: [],
+        key: [],
+      },
+      select: "",
     };
   },
   components: {
     layout,
     taskInfo,
+    addTask,
+    editTask,
+    draggable,
+  },
+  mounted() {
+    this.getTaskList();
+    this.loadData();
   },
   methods: {
-    openTaskInfo() {
+    ...mapMutations(["setUser"]),
+    log(data, event) {
+      if (event.added) {
+        console.log("data", data);
+        console.log(event);
+        axios
+          .post(
+            "http://localhost:3002/api/task/update/" + event.added.element._id,
+            {
+              status: data.status,
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("tokenSocket")}`,
+              },
+            }
+          )
+          .then(() => {})
+          .catch((err) => {
+            console.error(err);
+          });
+      }
+    },
+    randomColor(id) {
+      const r = () => Math.floor(256 * Math.random());
+
+      return this.colorCache[id] || (this.colorCache[id] = `rgb(${r()}, ${r()}, ${r()})`);
+    },
+    openTaskInfo(i) {
+      this.info = i;
       this.showModal = !this.showModal;
     },
-    addIssue: function (key) {
-      if (!this.create[key]) return;
-      this[key].push({
-        name: this.create[key],
-        estimate: "2d",
+    handleSearch() {
+      this.getTaskList();
+    },
+    filterPriority() {
+      console.log("select", this.select);
+      // console.log("event", event);
+      this.priority = this.select.value;
+      this.getTaskList();
+    },
+    filterUser(user) {
+      this.clickOn = !this.clickOn;
+      let index = this.user_id.findIndex((i) => i == user._id);
+      console.log("index1", index);
+      if (index == -1) {
+        console.log("index2", index);
+        this.user_id.push(user._id);
+      } else {
+        this.user_id.splice(index, 1);
+      }
+      console.log("user_id", this.user_id);
+      this.getTaskList();
+    },
+    async openAddTaskModal() {
+      this.showAddModal = !this.showAddModal;
+      await this.getTaskList();
+    },
+    async openEditTaskModal(obj) {
+      this.showEditModal = !this.showEditModal;
+      this.taskObject = obj;
+      await this.getTaskList();
+    },
+    async loadData() {
+      await axios.post("http://localhost:3002/api/user/list").then((response) => {
+        this.users = response.data.data;
+        console.log(this.users);
       });
-      this.create[key] = "";
+    },
+    async getTaskList() {
+      let filter = {};
+      if (this.user_id.length != 0) filter.assign_to = this.user_id;
+      if (this.priority) filter.priority = this.priority;
+      await axios
+        .post("http://localhost:3002/api/task/list", {
+          search: this.search,
+          filter,
+        })
+        .then((res) => {
+          this.tasks = res.data.data;
+          this.tasks = this.tasks.map((task) => {
+            task.name = task.status.replace(/_/g, " ").toUpperCase();
+            return task;
+          });
+          console.log("tasks", this.tasks);
+        });
+    },
+    deleteClick(_id) {
+      if (!confirm("Are you sure?")) {
+        return;
+      }
+      axios.delete("http://localhost:3002/api/task/delete/" + _id).then((response) => {
+        console.log("res-delete", response);
+        this.showModal = false;
+        this.getTaskList();
+        alert("Xoá thành công");
+      });
     },
   },
   computed: {
     ...mapState(["user"]),
   },
 };
-
-function onCreate() {
-  $(document).ready(() => {
-    dragula([
-      document.getElementById("tasks"),
-      document.getElementById("inprogress"),
-      document.getElementById("review"),
-      document.getElementById("approved"),
-    ])
-      .on("drag", function (el) {
-        el.classList.add("is-moving");
-      })
-
-      .on("dragend", function (el) {
-        el.classList.remove("is-moving");
-        window.setTimeout(function () {
-          el.classList.add("is-moved");
-          window.setTimeout(function () {
-            el.classList.remove("is-moved");
-          }, 600);
-        }, 100);
-      });
-  });
-}
 </script>
 <style lang="scss" scoped>
 * {
@@ -141,7 +263,6 @@ ul {
 }
 
 .task-container {
-  max-width: 1200px;
   margin: 20px auto;
   .task-list {
     display: flex;
@@ -150,9 +271,9 @@ ul {
       display: block;
     }
     .task-column {
-      flex: 1;
+      width: calc(100% / 5 - 20px);
       margin: 0 10px;
-      padding: 10px;
+      padding: 10px 10px 0 10px;
       position: relative;
       overflow: hidden;
       background: #dbe1ec;
@@ -186,9 +307,9 @@ ul {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 1.5rem;
+        padding: 15px;
         h2 {
-          font-size: 1.5rem;
+          font-size: 20px;
           font-weight: 400;
           margin: 0;
           text-transform: uppercase;
@@ -200,6 +321,7 @@ ul {
         .task-options {
           background: #4b9efd;
           color: white;
+          border-radius: 50px;
         }
       }
       &-in-progress {
@@ -231,7 +353,10 @@ ul {
 }
 
 .task-inner-list {
-  min-height: 50px;
+  margin-top: 20px;
+  max-height: 450px;
+  overflow-y: scroll;
+  margin-right: -10px;
 }
 
 .task-item {
@@ -245,6 +370,10 @@ ul {
   box-shadow: 0px 2px 5px rgba(#cfd9ea, 0.1);
   transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
   cursor: pointer;
+  margin-right: 5px;
+  // &:last-child {
+  //   margin-bottom: 0;
+  // }
   h1 {
     margin: 0;
     font-size: 14px;
@@ -312,5 +441,120 @@ ul {
 
 .gu-transit {
   opacity: 0.5;
+}
+.add-task {
+  background: #4b9efd;
+  font-size: 15px;
+  color: white;
+  border: none;
+}
+.task-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  margin-top: 10px;
+}
+.assigner {
+  width: 35px;
+  height: 35px;
+  background: greenyellow;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 10px;
+  cursor: pointer;
+}
+.task-action {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 10px;
+  align-items: center;
+}
+.taskname {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 135px;
+  text-align: start;
+}
+.redtext {
+  color: red;
+}
+.yellowtext {
+  color: blue;
+}
+.box-search {
+  position: relative;
+  height: 40px;
+  width: 45%;
+  margin-right: 8px;
+}
+.box-search > img {
+  position: absolute;
+  top: 50%;
+  transform: translate(0, -50%);
+  left: 25px;
+  width: 15px;
+}
+.search-ip-custom {
+  width: 100%;
+  border: 1px solid #c8cdd6;
+  box-sizing: border-box;
+  border-radius: 5px;
+  padding: 7px 7px 7px 41px;
+  height: 40px;
+  background: #ffffff;
+  font-size: 14px;
+  line-height: 21px;
+  color: #27324d;
+}
+.search-ip-custom::placeholder {
+  color: #c8cdd6;
+}
+.user-list {
+  display: flex;
+  align-items: center;
+  margin-left: 20px;
+  .user {
+    margin-left: -10px;
+    .avatar {
+      position: relative;
+      width: 45px;
+      height: 45px;
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: 2px solid white;
+      .user-name{
+        display: none;
+      }
+      &:hover > .user-name {
+        display: block !important;
+        position: absolute;
+        bottom: -22px;
+        color: #566578;
+        width: 200px;
+      }
+    }
+  }
+  .user:first-child {
+    margin-left: 0 !important;
+  }
+}
+.avatarborder {
+  opacity: 100000;
+  border: 3px solid greenyellow !important;
+}
+.task-header {
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  justify-content: space-between;
 }
 </style>

@@ -1,17 +1,17 @@
 <template>
   <a-layout id="components-layout-demo-custom-trigger">
-    <a-layout-sider v-model="collapsed" :trigger="null" collapsible >
+    <a-layout-sider v-model="collapsed" :trigger="null" collapsible>
       <a-menu theme="dark" mode="inline" :default-selected-keys="['1']">
         <a-menu-item key="1">
-          <router-link v-if="user.role == '0'" to="/admin/list">
-            <a-icon type="user" />
-            <span>Quản lý người dùng</span>
-          </router-link>
-        </a-menu-item>
-        <a-menu-item key="2">
           <router-link to="/task">
             <a-icon type="team" />
             <span>Quản lý công việc</span>
+          </router-link>
+        </a-menu-item>
+        <a-menu-item key="2" v-if="user.role == '0'">
+          <router-link to="/admin/list">
+            <a-icon type="user" />
+            <span>Quản lý người dùng</span>
           </router-link>
         </a-menu-item>
         <a-menu-item key="3">
@@ -26,7 +26,7 @@
       <a-layout-header style="background: #fff; padding: 0">
         <a-icon class="trigger" style="float: left" :type="collapsed ? 'menu-unfold' : 'menu-fold'" @click="() => (collapsed = !collapsed)" />
         <div class="config">
-          <div class="manage">Quản lý người dùng</div>
+          <div class="manage"><slot name="name-tab"> </slot></div>
           <div class="hello">
             Hello {{ user.name }}
             <div class="avatar">{{ user.name.charAt(0) }}</div>
@@ -50,7 +50,7 @@
 <script>
 import { mapMutations } from "vuex";
 import { mapState } from "vuex";
-
+import axios from "axios";
 export default {
   data() {
     return {
@@ -62,11 +62,41 @@ export default {
   },
   methods: {
     ...mapMutations(["setUser"]),
+    async checkToken() {
+      try {
+        let token = localStorage.getItem("tokenSocket");
+        if (token) {
+          let response = await axios.get(`${process.env.VUE_APP_URL}/user/check-token`, {
+            headers: { Authorization: "Bearer " + token },
+          });
+          if (response.data.success) {
+            let user = {
+              name: response.data.data.name,
+              role: response.data.data.role,
+              id: response.data.data._id,
+              auth: true,
+            };
+            this.setUser(user);
+            return response.data;
+          }
+        } else {
+          this.$router.push({ path: "/login" });
+        }
+      } catch (error) {
+        console.error(error.response);
+        if (!error.response.data.success) {
+          this.$router.push({ path: "/login" });
+        }
+      }
+    },
+  },
+  async created() {
+    await this.checkToken();
   },
 };
 </script>
 <style scoped>
-section{
+section {
   height: 100% !important;
 }
 .ant-menu-item {
@@ -100,12 +130,12 @@ section{
   font-weight: 500;
   font-size: 20px;
 }
-.hello{
+.hello {
   display: flex;
   align-items: center;
   text-transform: uppercase;
 }
-.avatar{
+.avatar {
   width: 35px;
   height: 35px;
   background: greenyellow;

@@ -1,5 +1,6 @@
 <template>
   <layout>
+    <div slot="name-tab">Quản lý người dùng</div>
     <div class="content">
       <div class="header">
         <h2>Quản lý người dùng</h2>
@@ -25,7 +26,7 @@
       </div>
 
       <div class="ant-table">
-        <a-table :columns="columns" :data-source="users" bordered :pagination="{ pageSize: 6 }">
+        <a-table :columns="columns" :data-source="users" bordered :pagination="{ pageSize: 5 }">
           <template slot="id" slot-scope="id, record, index">
             {{ index + 1 }}
           </template>
@@ -66,7 +67,7 @@ import layout from "../layouts/layout.vue";
 const columns = [
   {
     title: "STT",
-    width: "4%",
+    width: "5%",
     dataIndex: "id",
     scopedSlots: { customRender: "id" },
   },

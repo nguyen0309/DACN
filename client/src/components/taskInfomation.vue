@@ -18,10 +18,28 @@
         <h3>Task Infomation</h3>
       </div>
     </template>
-    <div class="add-address">
-      <div class="task-name">Task name: {{ task.name }}</div>
-      <div class="task-name">Estimate time: {{ task.time }}</div>
-      <div class="task-name">Mô tả: {{ task.description }}</div>
+    <div class="add-address" v-if="task">
+      <div class="task-name">
+        Tên công việc: <span> {{ task.name }}</span>
+      </div>
+      <div class="task-name">
+        Thời gian dự kiến: <span>{{ task.estimate_time }}</span>
+      </div>
+      <div class="task-name">
+        Người làm: <span v-if="task.map_assign">{{ task.map_assign.name }}</span>
+      </div>
+      <div class="task-name">
+        Độ ưu tiên:
+        <span
+          class="priority"
+          :class="{ redtext: task.priority == 'high', greentext: task.priority == 'normal', yellowtext: task.priority == 'low' }"
+        >
+          {{ task.priority }}</span
+        >
+      </div>
+      <div class="task-name">
+        Mô tả:<span> {{ task.description }}</span>
+      </div>
     </div>
     <div class="add-shop-footer">
       <a-button @click="hide" style="width: 73px; border-radius: 8px; height: 37px"> Thoát </a-button>
@@ -163,5 +181,20 @@ export default {
       color: #ffffff;
     }
   }
+}
+.priority {
+  text-transform: uppercase;
+}
+.redtext {
+  color: red;
+}
+.yellowtext {
+  color: blue;
+}
+.greentext {
+  color: greenyellow;
+}
+.task-name{
+  font-weight: 500;
 }
 </style>
