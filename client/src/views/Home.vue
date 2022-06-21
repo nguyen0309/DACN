@@ -11,10 +11,12 @@ import ChatView from "@/components/chatview.vue";
 
 export default {
   name: "Home",
-  head() {
-    return {
-      title: "Trang chủ",
-    };
+  head: {
+    title() {
+      return {
+        inner: 'Homepage',
+      };
+    },
   },
   components: {
     ChatList,

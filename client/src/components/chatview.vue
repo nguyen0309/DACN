@@ -49,14 +49,14 @@
                 v-if="!u.in"
                 @click="handleAddUser(u._id)"
               >
-                Thêm
+               Add
               </button>
               <button
                 class="add-button"
                 v-if="u.in && u._id != conversion.sender_id"
                 @click="handleRemoveUser(u._id)"
               >
-                Xoá
+                Delete
               </button>
             </div>
           </div>
@@ -131,7 +131,7 @@
                 <input
                   type="text"
                   class="input-content"
-                  placeholder="Nhập tin nhắn"
+                  placeholder="Enter message"
                   v-model="text"
                 />
               </div>

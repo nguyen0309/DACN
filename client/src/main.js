@@ -11,6 +11,7 @@ import Vuelidate from "vuelidate";
 import VueChatScroll from "vue-chat-scroll";
 import Antd from "ant-design-vue";
 import "ant-design-vue/dist/antd.css";
+import VueHead from 'vue-head'
 
 Vue.config.productionTip = false;
 
@@ -21,6 +22,7 @@ Vue.use(Vuex);
 Vue.use(BootstrapVue);
 // Optionally install the BootstrapVue icon components plugin
 Vue.use(IconsPlugin);
+Vue.use(VueHead);
 Vue.config.productionTip = false;
 
 Vue.use(

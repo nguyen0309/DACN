@@ -20,29 +20,43 @@
     </template>
     <div class="add-address" v-if="task">
       <div class="task-name">
-        Tên công việc: <span> {{ task.name }}</span>
+        Task name: <span> {{ task.name }}</span>
       </div>
       <div class="task-name">
-        Thời gian dự kiến: <span>{{ task.estimate_time }}</span>
+        Estimate time:
+        <span
+          >{{ task.estimate_time }}<span v-if="task.estimate_time <= 1"> day</span>
+          <span v-else>days</span></span
+        >
       </div>
       <div class="task-name">
-        Người làm: <span v-if="task.map_assign">{{ task.map_assign.name }}</span>
+        Assign task to:
+        <span v-if="task.map_assign">{{ task.map_assign.name }}</span>
       </div>
       <div class="task-name">
-        Độ ưu tiên:
+        Priority:
         <span
           class="priority"
-          :class="{ redtext: task.priority == 'high', greentext: task.priority == 'normal', yellowtext: task.priority == 'low' }"
+          :class="{
+            redtext: task.priority == 'high',
+            greentext: task.priority == 'normal',
+            yellowtext: task.priority == 'low',
+          }"
         >
           {{ task.priority }}</span
         >
       </div>
       <div class="task-name">
-        Mô tả:<span> {{ task.description }}</span>
+        Description:<span> {{ task.description }}</span>
       </div>
     </div>
     <div class="add-shop-footer">
-      <a-button @click="hide" style="width: 73px; border-radius: 8px; height: 37px"> Thoát </a-button>
+      <a-button
+        @click="hide"
+        style="width: 73px; border-radius: 8px; height: 37px"
+      >
+        Cancel
+      </a-button>
     </div>
   </a-modal>
 </template>
@@ -194,7 +208,7 @@ export default {
 .greentext {
   color: greenyellow;
 }
-.task-name{
+.task-name {
   font-weight: 500;
 }
 </style>

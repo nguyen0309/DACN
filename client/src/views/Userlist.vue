@@ -1,39 +1,63 @@
 <template>
   <layout>
-    <div slot="name-tab">Quản lý người dùng</div>
+    <div slot="name-tab">User management</div>
     <div class="content">
       <div class="header">
-        <h2>Quản lý người dùng</h2>
+        <h2>User management</h2>
       </div>
       <div>
-        <a-button class="btn" type="primary" @click="showModal"> Add User </a-button>
+        <a-button class="btn" type="primary" @click="showModal">
+          Add User
+        </a-button>
         <a-modal v-model="visible" title="Add User" on-ok="handleOk">
           <template slot="footer">
             <a-button key="back" @click="handleCancel"> Return </a-button>
-            <a-button key="submit" type="primary" :loading="loading" @click="handleOk"> Submit </a-button>
+            <a-button
+              key="submit"
+              type="primary"
+              :loading="loading"
+              @click="handleOk"
+            >
+              Submit
+            </a-button>
           </template>
           <form action="" method="POST">
             <div class="label">Name</div>
             <input class="input" type="text" v-model="name" />
             <div class="label">Phone</div>
             <input class="input" type="text" v-model="phone" />
-            <div class="label">password</div>
+            <div class="label">Password</div>
             <input class="input" type="password" v-model="password" />
           </form>
-
-          <!-- <select class="input"></select> -->
         </a-modal>
       </div>
 
       <div class="ant-table">
-        <a-table :columns="columns" :data-source="users" bordered :pagination="{ pageSize: 5 }">
+        <a-table
+          :columns="columns"
+          :data-source="users"
+          bordered
+          :pagination="{ pageSize: 5 }"
+        >
           <template slot="id" slot-scope="id, record, index">
             {{ index + 1 }}
           </template>
           <template slot="operation" slot-scope="text, record">
             <div class="action">
-              <button v-if="record.role != 0" class="edit" @click="() => handleUpdate(record._id)">Edit</button>
-              <button v-if="record.role != 0" class="delete" @click="deleteClick(record._id)">Delete</button>
+              <button
+                v-if="record.role != 0"
+                class="edit"
+                @click="() => handleUpdate(record._id)"
+              >
+                Edit
+              </button>
+              <button
+                v-if="record.role != 0"
+                class="delete"
+                @click="deleteClick(record._id)"
+              >
+                Delete
+              </button>
             </div>
           </template>
         </a-table>
@@ -43,14 +67,21 @@
         <a-modal v-model="visibleEdit" title="Edit User" on-ok="handleOk">
           <template slot="footer">
             <a-button key="back" @click="handleCancel"> Return </a-button>
-            <a-button key="submit" type="primary" :loading="loading" @click="handleEditOk"> OK </a-button>
+            <a-button
+              key="submit"
+              type="primary"
+              :loading="loading"
+              @click="handleEditOk"
+            >
+              OK
+            </a-button>
           </template>
           <form action="" method="POST">
             <div class="label">Name</div>
             <input class="input" type="text" v-model="name" />
             <div class="label">Phone</div>
             <input class="input" type="text" v-model="phone" />
-            <div class="label">password</div>
+            <div class="label">Password</div>
             <input class="input" type="password" v-model="password" />
           </form>
         </a-modal>
@@ -114,6 +145,13 @@ export default {
       collapsed: false,
     };
   },
+  head: {
+    title() {
+      return {
+        inner: "User management",
+      };
+    },
+  },
   components: {
     layout,
   },
@@ -123,10 +161,12 @@ export default {
   methods: {
     ...mapMutations(["setUser"]),
     async loadData() {
-      await axios.post("http://localhost:3002/api/user/list").then((response) => {
-        this.users = response.data.data;
-        console.log(this.users);
-      });
+      await axios
+        .post("http://localhost:3002/api/user/list")
+        .then((response) => {
+          this.users = response.data.data;
+          console.log(this.users);
+        });
     },
     addClick() {
       this.modalTitle = "Add User";
@@ -177,11 +217,13 @@ export default {
       if (!confirm("Are you sure?")) {
         return;
       }
-      axios.delete("http://localhost:3002/api/user/delete/" + _id).then((response) => {
-        console.log("res-delete", response);
-        this.loadData();
-        alert("Xoá thành công");
-      });
+      axios
+        .delete("http://localhost:3002/api/user/delete/" + _id)
+        .then((response) => {
+          console.log("res-delete", response);
+          this.loadData();
+          alert("Xoá thành công");
+        });
     },
     showModal() {
       this.visible = true;

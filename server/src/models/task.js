@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const taskSchema = new Schema({
   assign: { type: String, default: "" },
-  estimate_time: { type: String, default: 0 },
+  estimate_time: { type: Number, default: 0 },
   status: { type: String, default: "todo" },
   name: { type: String, require: true },
   code: { type: String },

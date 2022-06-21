@@ -20,57 +20,111 @@
     </template>
     <div class="add-address">
       <div class="input-content">
-        <span class="input-title">Task Name <span style="color: red">*</span></span>
-        <a-input v-model="name" placeholder="Tên công việc" :class="{ 'validate-err': validateName }" />
+        <span class="input-title"
+          >Task name <span style="color: red">*</span></span
+        >
+        <a-input
+          v-model="name"
+          placeholder="Task name"
+          :class="{ 'validate-err': validateName }"
+        />
         <div class="box-validate-pos" v-if="validateName">
-          <span class="text-validate">Không thể bỏ trống tên công việc!</span>
+          <span class="text-validate">Task name cannot be left blank!</span>
         </div>
       </div>
       <div class="input-content">
-        <span class="input-title">Estimate Time</span>
-        <a-input v-model="time" placeholder="Thời gian dự tính" :class="{ 'validate-err': validateTime }" />
+        <span class="input-title"
+          >Estimate time<span style="color: red">*</span></span
+        >
+        <a-input
+          v-model="time"
+          placeholder="Estimate time"
+          :class="{ 'validate-err': validateTime }"
+        />
         <div class="box-validate-pos" v-if="validateTime">
-          <span class="text-validate">Không thể bỏ trống thời gian!</span>
+          <span class="text-validate">Estimate time cannot be left blank!</span>
         </div>
       </div>
       <div class="input-content">
-        <span class="input-title">Assign To</span>
+        <span class="input-title"
+          >Assign task to<span style="color: red">*</span></span
+        >
         <select
-          style="height: 32px; border-radius: 4px; border: 1px solid #d9d9d9; padding-left: 10px; font-size: 14px"
+          style="
+            height: 32px;
+            border-radius: 4px;
+            padding-left: 10px;
+            border: 1px solid #d9d9d9;
+          "
           v-model="assign"
-          placeholder="Người làm"
+          placeholder="User"
           :class="{ 'validate-err': validateAssign }"
         >
-          <option v-for="user in users" :key="user._id" :value="user._id">{{ user.name }}</option>
+          <option v-for="user in users" :key="user._id" :value="user._id">
+            {{ user.name }}
+          </option>
         </select>
         <div class="box-validate-pos" v-if="validateAssign">
-          <span class="text-validate">Không thể bỏ trống người làm công việc!</span>
+          <span class="text-validate"
+            >Assign task to cannot be left blank!</span
+          >
         </div>
       </div>
       <div class="input-content">
-        <span class="input-title">Độ ưu tiên</span>
+        <span class="input-title"
+          >Priority<span style="color: red">*</span></span
+        >
         <select
-          style="height: 32px; border-radius: 4px; padding-left: 10px; border: 1px solid #d9d9d9"
+          style="
+            height: 32px;
+            border-radius: 4px;
+            padding-left: 10px;
+            border: 1px solid #d9d9d9;
+          "
           v-model="priority"
-          placeholder="Độ ưu tiên"
+          placeholder="Priority"
           :class="{ 'validate-err': validatePriority }"
         >
-          <option v-for="i in prioritys" :key="i.value" :value="i.value">{{ i.label }}</option>
+          <option v-for="i in prioritys" :key="i.value" :value="i.value">
+            {{ i.label }}
+          </option>
         </select>
         <div class="box-validate-pos" v-if="validatePriority">
-          <span class="text-validate">Không thể bỏ trống mức độ ưu tiên!</span>
+          <span class="text-validate">Priority cannot be left blank!</span>
         </div>
       </div>
       <div class="input-content">
-        <span class="input-title">Descriptions</span>
-        <a-textarea v-model="description" placeholder="Mô tả" :class="{ 'validate-err': validateDescription }" />
+        <span class="input-title"
+          >Description<span style="color: red">*</span></span
+        >
+        <a-textarea
+          v-model="description"
+          placeholder="Description"
+          :class="{ 'validate-err': validateDescription }"
+        />
         <div class="box-validate-pos" v-if="validateDescription">
-          <span class="text-validate">Không thể bỏ trống mô tả!</span>
+          <span class="text-validate">Description cannot be left blank!</span>
         </div>
       </div>
       <div class="add-shop-footer">
-        <a-button @click="hide" style="width: 73px; border-radius: 8px; height: 37px"> Huỷ </a-button>
-        <a-button @click="updateClick" type="primary" style="width: 73px; margin-left: 8px; border-radius: 8px; height: 37px"> Lưu </a-button>
+        <a-button
+          @click="hide"
+          style="width: 73px; border-radius: 8px; height: 37px"
+        >
+          Cancel
+        </a-button>
+        <a-button
+          @click="updateClick"
+          type="primary"
+          style="
+            width: 73px;
+            margin-left: 8px;
+            border-radius: 8px;
+            height: 37px;
+          "
+        >
+          Save
+        </a-button>
       </div>
     </div>
   </a-modal>
@@ -173,6 +227,7 @@ export default {
             name: this.name,
             estimate_time: this.time,
             assign: this.assign,
+            priority: this.priority,
             description: this.description,
           },
           {

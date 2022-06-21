@@ -1,12 +1,12 @@
 <template>
   <layout style="background: #dadceb">
-    <div slot="name-tab">Quản lý công việc</div>
+    <div slot="name-tab">Task management</div>
     <div class="task-header">
       <div class="box-search">
         <input
           type="text"
           class="search-ip-custom hover-bt"
-          placeholder="Gõ tên người làm hoặc code công việc để tìm kiếm"
+          placeholder="Enter user name or code to search"
           v-model="search"
           @keyup="handleSearch"
         />
@@ -26,45 +26,103 @@
         </div>
       </div>
       <select
-        style="height: 40px; width: 220px; font-size: 17px; padding-left: 10px; border-radius: 5px"
-        :placeholder="'Độ ưu tiên'"
+        style="
+          height: 40px;
+          width: 220px;
+          font-size: 17px;
+          padding-left: 10px;
+          border-radius: 5px;
+        "
         v-model="select"
         @change="filterPriority"
       >
-        <option value="" disabled selected>Độ ưu tiên</option>
-        <option v-for="i in prioritys" :key="i.value" :value="i">{{ i.name }}</option>
+        <option value="" disabled selected>Priority</option>
+        <option v-for="i in prioritys" :key="i.value" :value="i">
+          {{ i.name }}
+        </option>
       </select>
     </div>
     <div class="task-container">
       <draggable v-model="tasks" class="task-list">
-        <div v-for="item in tasks" :key="item.index" class="task-column task-column-on-hold">
+        <div
+          v-for="item in tasks"
+          :key="item.index"
+          class="task-column task-column-on-hold"
+        >
           <span class="task-column-header">
             <h2>{{ item.name }}</h2>
-            <button v-if="item.status == 'todo'" @click="openAddTaskModal" class="add-task">+ Add Task</button>
+            <button
+              v-if="item.status == 'todo'"
+              @click="openAddTaskModal"
+              class="add-task"
+            >
+              + Add Task
+            </button>
           </span>
-          <draggable :list="item.list" :group="{ name: 'item' }" class="task-inner-list" @change="log(item, $event)">
+          <draggable
+            :list="item.list"
+            :group="{ name: 'item' }"
+            class="task-inner-list"
+            @change="log(item, $event)"
+          >
             <div v-for="i in item.list" :key="i.id" class="task-item">
               <div class="task-action">
-                <div @click="openTaskInfo(i)" :class="{ taskname: true, redtext: i.priority == 'high', yellowtext: i.priority == 'low' }">
+                <div
+                  :class="{
+                    taskname: true,
+                    redtext: i.priority == 'high',
+                    yellowtext: i.priority == 'low',
+                  }"
+                  @click="openTaskInfo(i)"
+                >
                   {{ i.name }}
                 </div>
                 <div class="action">
-                  <img style="margin-right: 10px" @click="openEditTaskModal(i)" src="../assets/images/edit.svg" alt="" />
-                  <img @click="deleteClick(i._id)" src="../assets/images/delete.svg" alt="" />
+                  <img
+                    style="margin-right: 10px; z-index: 100000"
+                    @click="openEditTaskModal(i)"
+                    src="../assets/images/edit.svg"
+                    alt=""
+                  />
+                  <img
+                    @click="deleteClick(i._id)"
+                    src="../assets/images/delete.svg"
+                    alt=""
+                  />
                 </div>
               </div>
               <div class="task-info">
-                <div>{{ i.code }} - {{ i.estimate_time }}</div>
-                <div class="assigner" :style="{ backgroundColor: randomColor(i.map_assign._id) }">
+                <div>
+                  {{ i.code }} - {{ i.estimate_time }}
+                  <span v-if="i.estimate_time <= 1">day</span>
+                  <span v-else>days</span>
+                </div>
+                <div
+                  class="assigner"
+                  :style="{ backgroundColor: randomColor(i.map_assign._id) }"
+                >
                   {{ i.map_assign.name.charAt(0) }}
                 </div>
               </div>
             </div>
           </draggable>
         </div>
-        <taskInfo :task="info" :show="showModal" @hide="openTaskInfo"></taskInfo>
-        <addTask :users="users" :showModal="showAddModal" @hide="openAddTaskModal"></addTask>
-        <editTask :users="users" :showEdit="showEditModal" :taskObject="taskObject" @hide="openEditTaskModal"></editTask>
+        <taskInfo
+          :task="info"
+          :show="showModal"
+          @hide="openTaskInfo"
+        ></taskInfo>
+        <addTask
+          :users="users"
+          :showModal="showAddModal"
+          @hide="openAddTaskModal"
+        ></addTask>
+        <editTask
+          :users="users"
+          :showEdit="showEditModal"
+          :taskObject="taskObject"
+          @hide="openEditTaskModal"
+        ></editTask>
       </draggable>
     </div>
   </layout>
@@ -83,11 +141,6 @@ export default {
   name: "functional",
   display: "Functional third party",
   order: 17,
-  head() {
-    return {
-      title: "Quản lý công việc",
-    };
-  },
   data() {
     return {
       showModal: false,
@@ -131,6 +184,13 @@ export default {
       select: "",
     };
   },
+  head: {
+    title() {
+      return {
+        inner: "Task management",
+      };
+    },
+  },
   components: {
     layout,
     taskInfo,
@@ -169,7 +229,10 @@ export default {
     randomColor(id) {
       const r = () => Math.floor(256 * Math.random());
 
-      return this.colorCache[id] || (this.colorCache[id] = `rgb(${r()}, ${r()}, ${r()})`);
+      return (
+        this.colorCache[id] ||
+        (this.colorCache[id] = `rgb(${r()}, ${r()}, ${r()})`)
+      );
     },
     openTaskInfo(i) {
       this.info = i;
@@ -207,10 +270,12 @@ export default {
       await this.getTaskList();
     },
     async loadData() {
-      await axios.post("http://localhost:3002/api/user/list").then((response) => {
-        this.users = response.data.data;
-        console.log(this.users);
-      });
+      await axios
+        .post("http://localhost:3002/api/user/list")
+        .then((response) => {
+          this.users = response.data.data;
+          console.log(this.users);
+        });
     },
     async getTaskList() {
       let filter = {};
@@ -234,12 +299,14 @@ export default {
       if (!confirm("Are you sure?")) {
         return;
       }
-      axios.delete("http://localhost:3002/api/task/delete/" + _id).then((response) => {
-        console.log("res-delete", response);
-        this.showModal = false;
-        this.getTaskList();
-        alert("Xoá thành công");
-      });
+      axios
+        .delete("http://localhost:3002/api/task/delete/" + _id)
+        .then((response) => {
+          console.log("res-delete", response);
+          this.showModal = false;
+          this.getTaskList();
+          alert("Xoá thành công");
+        });
     },
   },
   computed: {
@@ -474,6 +541,7 @@ ul {
   align-items: center;
 }
 .taskname {
+  font-weight: bold;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -531,7 +599,7 @@ ul {
       justify-content: center;
       cursor: pointer;
       border: 2px solid white;
-      .user-name{
+      .user-name {
         display: none;
       }
       &:hover > .user-name {

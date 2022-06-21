@@ -5,19 +5,19 @@
         <a-menu-item key="1">
           <router-link to="/task">
             <a-icon type="team" />
-            <span>Quản lý công việc</span>
+            <span>Task management</span>
           </router-link>
         </a-menu-item>
         <a-menu-item key="2" v-if="user.role == '0'">
           <router-link to="/admin/list">
             <a-icon type="user" />
-            <span>Quản lý người dùng</span>
+            <span>User management</span>
           </router-link>
         </a-menu-item>
         <a-menu-item key="3">
           <router-link to="/">
             <a-icon type="twitter" />
-            <span>Trò chuyện</span>
+            <span>Chatbox</span>
           </router-link>
         </a-menu-item>
       </a-menu>

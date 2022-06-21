@@ -9,5 +9,4 @@ taskRoute
     .post("/create", auth, taskCtr.create)
     .post("/update/:id", auth, taskCtr.update)
     .delete("/delete/:id", taskCtr.delete)
-
 module.exports = taskRoute
