@@ -20,44 +20,18 @@
           <b-card title="Collapsible card"> Hello world! </b-card>
         </b-collapse>
       </div>
-      <div
-        v-if="conversion.name && conversion.sender_id == user.id"
-        style="margin-left: 50px; display: flex; position: relative"
-      >
-        <button
-          class="btn btn-success"
-          @click="displayAddUser"
-          style="width: 150px"
-        >
+      <div v-if="conversion.name && conversion.sender_id == user.id" style="margin-left: 50px; display: flex; position: relative">
+        <button class="btn btn-success" @click="displayAddUser" style="width: 150px">
           {{ showAddUSer ? "Huỷ" : "Thêm thành viên" }}
         </button>
         <!-- <form action=""> -->
-        <input
-          v-if="showAddUSer"
-          type="text"
-          style="margin-left: 50px"
-          v-model="search"
-          @keypress="handleChangeAddUser"
-        />
+        <input v-if="showAddUSer" type="text" style="margin-left: 50px" v-model="search" @keypress="handleChangeAddUser" />
         <div v-if="showAddUSer" class="list-user">
-          <div style="display: flex" v-for="u in listUser" :key="u._id">
-            <div style="width: 100px; height: 35px">{{ u.name }}</div>
-            <div style="width: 100px">{{ u.phone }}</div>
-            <div style="width: 50px">
-              <button
-                class="add-button"
-                v-if="!u.in"
-                @click="handleAddUser(u._id)"
-              >
-               Add
-              </button>
-              <button
-                class="add-button"
-                v-if="u.in && u._id != conversion.sender_id"
-                @click="handleRemoveUser(u._id)"
-              >
-                Delete
-              </button>
+          <div style="display: flex; justify-content: space-between; padding: 4px;" v-for="u in listUser" :key="u._id">
+            <div style="width: 100px; height: 35p; text-align: left;">{{ u.name }}</div>
+            <div style="width: 55px">
+              <button class="add-button" v-if="!u.in" @click="handleAddUser(u._id)">Add</button>
+              <button class="add-button" v-if="u.in && u._id != conversion.sender_id" @click="handleRemoveUser(u._id)">Delete</button>
             </div>
           </div>
         </div>
@@ -70,30 +44,14 @@
             <!-- <img style="width: 50px; height: 50px;position: absolute;" src="../assets/images/cat.jpg" alt=""> -->
             <p
               v-if="m.sender_id != user.id && conversion.type == 'group'"
-              style="
-                margin: 0;
-                text-align: left;
-                margin-left: 10%;
-                font-size: 12px;
-                margin-bottom: -9px;
-              "
+              style="margin: 0; text-align: left; margin-left: 10%; font-size: 12px; margin-bottom: -9px"
             >
               {{ m.sender_name }}
             </p>
             <div :class="[user.id == m.sender_id ? 'your-text' : 'chat']">
-              <div
-                :class="[
-                  user.id == m.sender_id ? 'your-content' : 'chat-content',
-                ]"
-              >
-                <div
-                  :class="[
-                    user.id == m.sender_id ? 'content-right' : 'content',
-                  ]"
-                >
-                  <span v-if="m.type == 'image'"
-                    ><img :src="m.message" alt="" style="max-width: 300px"
-                  /></span>
+              <div :class="[user.id == m.sender_id ? 'your-content' : 'chat-content']">
+                <div :class="[user.id == m.sender_id ? 'content-right' : 'content']">
+                  <span v-if="m.type == 'image'"><img :src="m.message" alt="" style="max-width: 300px" /></span>
                   <span v-else>{{ m.message }}</span>
                 </div>
                 <div :class="[user.id == m.sender_id ? 'your-time' : 'time']">
@@ -128,12 +86,7 @@
                 </svg>
               </div>
               <div class="message-input">
-                <input
-                  type="text"
-                  class="input-content"
-                  placeholder="Enter message"
-                  v-model="text"
-                />
+                <input type="text" class="input-content" placeholder="Enter message" v-model="text" />
               </div>
               <div class="icon">
                 <svg
@@ -150,25 +103,13 @@
                   class="feather feather-paperclip"
                   @click="handleOpenFile"
                 >
-                  <path
-                    d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"
-                  ></path>
+                  <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
                 </svg>
-                <input
-                  type="file"
-                  ref="inputFile"
-                  v-show="false"
-                  @change="handleImg($event)"
-                />
+                <input type="file" ref="inputFile" v-show="false" @change="handleImg($event)" />
               </div>
             </div>
             <div class="message-footer-right">
-              <button
-                class="message-footer-right-content"
-                type="submit"
-                style="border: none"
-                @click="createMessage"
-              >
+              <button class="message-footer-right-content" type="submit" style="border: none" @click="createMessage">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   style="color: #3390ec"
@@ -263,44 +204,31 @@ export default {
         if (this.flag) {
           let data = new FormData();
           data.append("sampleFile", this.img);
-          let rsImg = await axios.post(
-            `${process.env.VUE_APP_URL}/upload`,
-            data,
-            {
-              headers: {
-                "Content-Type": "multipart/form-data",
-              },
-            }
-          );
+          let rsImg = await axios.post(`${process.env.VUE_APP_URL}/upload`, data, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          });
           this.text = rsImg.data.data.url;
           console.log("rsupload", rsImg.data.data);
         }
 
-        let res = await axios.post(
-          `${process.env.VUE_APP_URL}/message/create`,
-          {
-            sender_id: this.user.id,
-            conversion_id: this.cvs_id,
-            sender_name: this.user.name,
-            receiver_id:
-              this.user.id == this.conversion.sender_id
-                ? this.conversion.receiver_id
-                : this.conversion.sender_id,
-            message: this.text,
-            type: !this.flag ? "message" : "image",
-          }
-        );
+        let res = await axios.post(`${process.env.VUE_APP_URL}/message/create`, {
+          sender_id: this.user.id,
+          conversion_id: this.cvs_id,
+          sender_name: this.user.name,
+          receiver_id: this.user.id == this.conversion.sender_id ? this.conversion.receiver_id : this.conversion.sender_id,
+          message: this.text,
+          type: !this.flag ? "message" : "image",
+        });
         this.flag = false;
         //send message
 
         if (res.data.success) {
-          let updateConve = await axios.post(
-            `${process.env.VUE_APP_URL}/conversion/update/${this.cvs_id}`,
-            {
-              last_message: res.data.data._id,
-              updated_time: Date.now(),
-            }
-          );
+          let updateConve = await axios.post(`${process.env.VUE_APP_URL}/conversion/update/${this.cvs_id}`, {
+            last_message: res.data.data._id,
+            updated_time: Date.now(),
+          });
           this.messages.push(res.data.data);
           console.log("updateConve", updateConve);
           this.text = "";
@@ -314,9 +242,7 @@ export default {
     },
     async fetchMessages() {
       try {
-        let list = await axios.get(
-          `${process.env.VUE_APP_URL}/message/list/${this.cvs_id}`
-        );
+        let list = await axios.get(`${process.env.VUE_APP_URL}/message/list/${this.cvs_id}`);
         console.log("listMess", list.data);
         this.messages = list.data.data;
       } catch (error) {
@@ -325,13 +251,8 @@ export default {
     },
     async fetchDetaiUser() {
       try {
-        let idRe =
-          this.conversion.sender_id == this.user.id
-            ? this.conversion.receiver_id
-            : this.conversion.sender_id;
-        let user = await axios.get(
-          `${process.env.VUE_APP_URL}/user/get/${idRe}`
-        );
+        let idRe = this.conversion.sender_id == this.user.id ? this.conversion.receiver_id : this.conversion.sender_id;
+        let user = await axios.get(`${process.env.VUE_APP_URL}/user/get/${idRe}`);
         if (user.data.success) {
           this.detailUser = user.data.data;
         }
@@ -380,12 +301,9 @@ export default {
         let arrMembers = this.conversion.members;
         arrMembers.push(id);
         // console.log('arrMembers', arrMembers)
-        let rs = await axios.post(
-          `${process.env.VUE_APP_URL}/conversion/update/${this.conversion._id}`,
-          {
-            members: arrMembers,
-          }
-        );
+        let rs = await axios.post(`${process.env.VUE_APP_URL}/conversion/update/${this.conversion._id}`, {
+          members: arrMembers,
+        });
         console.log("rsc", rs);
         await this.loadUser();
       } catch (error) {
@@ -399,12 +317,9 @@ export default {
         let index = arrMembers.findIndex((m) => m === id);
         if (index == -1) return;
         arrMembers.splice(index, 1);
-        let updateConve = await axios.post(
-          `${process.env.VUE_APP_URL}/conversion/update/${this.cvs_id}`,
-          {
-            members: arrMembers,
-          }
-        );
+        let updateConve = await axios.post(`${process.env.VUE_APP_URL}/conversion/update/${this.cvs_id}`, {
+          members: arrMembers,
+        });
         if (updateConve.data.success) {
           await this.loadUser();
         }
@@ -457,17 +372,10 @@ export default {
   border-radius: 100%;
   margin-left: 10%;
 }
-.boxchat
-  .message-footer
-  .message-footer-right
-  .message-footer-right-content:hover {
+.boxchat .message-footer .message-footer-right .message-footer-right-content:hover {
   background-color: #3390ec;
 }
-.boxchat
-  .message-footer
-  .message-footer-right
-  .message-footer-right-content
-  svg:hover {
+.boxchat .message-footer .message-footer-right .message-footer-right-content svg:hover {
   fill: white;
   color: white;
 }
@@ -626,6 +534,7 @@ export default {
   max-width: auto;
   top: 43px;
   left: 200px;
+  width: 200px;
   background-color: #fff;
   border-radius: 5px;
   z-index: 99999;

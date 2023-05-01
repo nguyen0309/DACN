@@ -3,7 +3,7 @@ class Socket {
     static connectSocket (server) {
         const io = socketConstruc(server, {
             cors: {
-              origin: "http://localhost:8081",
+              origin: "http://localhost:8080",
               methods: ["GET", "POST"],
               transports: ['websocket', 'polling'],
               credentials: true

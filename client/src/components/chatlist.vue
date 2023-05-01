@@ -6,110 +6,56 @@
           <i class="fas fa-bars"></i>
         </div>
         <b-sidebar id="my-sidebar" title="User Information" shadow>
-          <div>
+          <div class="wrap-chatlist">
             <div>
-              <img
-                class="img-user"
-                style="width: 100px; height: 100px"
-                src="http://windows79.com/wp-content/uploads/2021/02/Thay-the-hinh-dai-dien-tai-khoan-nguoi-dung-mac.png"
-                alt=""
-              />
+              <div>
+                <img
+                  class="img-user"
+                  style="width: 100px; height: 100px"
+                  src="http://windows79.com/wp-content/uploads/2021/02/Thay-the-hinh-dai-dien-tai-khoan-nguoi-dung-mac.png"
+                  alt=""
+                />
+              </div>
+              <h3>{{ user.name }}</h3>
+              <router-link v-if="user.role == '0'" to="/admin/list" style="margin-bottom: 20px; font-size: 18px"> User management </router-link>
             </div>
-            <h3>{{ user.name }}</h3>
-            <router-link
-              v-if="user.role == '0'"
-              to="/admin/list"
-              style="margin-bottom: 20px; font-size: 18px"
-            >
-              User management /
-            </router-link>
-            <span
-              style="color: blue; font-size: 18px; cursor: pointer"
-              @click="handleLogout"
-              >Log out</span
-            >
-          </div>
-          <div class="task">
-            <router-link
-              to="/task"
-              style="margin-bottom: 20px; font-size: 18px"
-            >
-              Task list
-            </router-link>
-          </div>
-          <button
-            class="btn btn-success"
-            @click="showCreateGroup"
-            style="margin-bottom: 20px; margin-top: 20px"
-          >
-            Create group
-          </button>
-          <form v-if="isGroup" method="post" style="margin-bottom: 20px">
-            <input
-              type="text"
-              v-model="groupName"
-              class="form-control"
-              placeholder="Nhấn enter sau khi đặt tên để hoàn thành"
-            />
-            <input v-show="false" type="submit" @click="handleCreateGroup" />
-          </form>
-          <h4>User List</h4>
-          <div class="px-3 py-2">
-            <div
-              v-for="(user, index) in listUser"
-              :key="index"
-              class="user-content"
-              style=""
-            >
-              <img
-                class="img-user"
-                src="http://windows79.com/wp-content/uploads/2021/02/Thay-the-hinh-dai-dien-tai-khoan-nguoi-dung-mac.png"
-                alt=""
-                style=""
-              />
-              <p>{{ user.name }}</p>
-              <div class="status" style="">
-                <div :class="[user.online ? 'dot-blue' : 'dot-black']"></div>
-                <button
-                  class="button"
-                  style="width: 50px; height: 20px; font-size: 10px"
-                  @click="handleCreateConversion(user)"
-                >
-                  Send
-                </button>
+            <div class="task">
+              <router-link to="/task" style="margin-bottom: 20px; font-size: 18px"> Task list </router-link>
+            </div>
+            <button class="btn btn-success" @click="showCreateGroup" style="margin-bottom: 20px; margin-top: 20px">Create group</button>
+            <form v-if="isGroup" method="post" style="margin-bottom: 20px">
+              <input type="text" v-model="groupName" class="form-control" placeholder="Nhấn enter sau khi đặt tên để hoàn thành" />
+              <input v-show="false" type="submit" @click="handleCreateGroup" />
+            </form>
+            <h4>User List</h4>
+            <div class="px-3 py-2">
+              <div v-for="(user, index) in listUser" :key="index" class="user-content" style="">
+                <img
+                  class="img-user"
+                  src="http://windows79.com/wp-content/uploads/2021/02/Thay-the-hinh-dai-dien-tai-khoan-nguoi-dung-mac.png"
+                  alt=""
+                  style=""
+                />
+                <p>{{ user.name }}</p>
+                <div class="status" style="">
+                  <div :class="[user.online ? 'dot-blue' : 'dot-black']"></div>
+                  <button class="button" style="width: 50px; height: 20px; font-size: 10px" @click="handleCreateConversion(user)">Send</button>
+                </div>
               </div>
             </div>
+            <div class="logout" @click="handleLogout">Log out</div>
           </div>
         </b-sidebar>
-        <input
-          class="input-search"
-          type="search"
-          v-model="search"
-          @keyup="handleSearchConversion"
-          placeholder="Tìm kiếm ..."
-        />
+        <input class="input-search" type="search" v-model="search" @keyup="handleSearchConversion" placeholder="Tìm kiếm ..." />
       </div>
       <div class="chat-list">
         <div v-for="conv in listConversion" :key="conv._id">
-          <div
-            :class="['users', userActive[conv._id] ? 'active' : '']"
-            style=""
-            @click="loadMessages(conv)"
-          >
-            <img
-              src="http://windows79.com/wp-content/uploads/2021/02/Thay-the-hinh-dai-dien-tai-khoan-nguoi-dung-mac.png"
-              alt=""
-            />
+          <div :class="['users', userActive[conv._id] ? 'active' : '']" style="" @click="loadMessages(conv)">
+            <img src="http://windows79.com/wp-content/uploads/2021/02/Thay-the-hinh-dai-dien-tai-khoan-nguoi-dung-mac.png" alt="" />
             <div class="content">
               <div class="content-top">
                 <div class="name">
-                  {{
-                    conv.name
-                      ? conv.name
-                      : conv.sender_id == user.id
-                      ? conv.receiver_name
-                      : conv.sender_name
-                  }}
+                  {{ conv.name ? conv.name : conv.sender_id == user.id ? conv.receiver_name : conv.sender_name }}
                 </div>
                 <!-- <span class="online"></span> -->
                 <div class="time">
@@ -119,11 +65,7 @@
               <div class="content-bot">
                 <div class="message">
                   <div>
-                    {{
-                      conv.last_message
-                        ? conv.last_message.sender_name + " :"
-                        : ""
-                    }}
+                    {{ conv.last_message ? conv.last_message.sender_name + " :" : "" }}
                   </div>
                   <div>
                     {{ conv.last_message ? conv.last_message.message : "" }}
@@ -202,9 +144,7 @@ export default {
       try {
         const res = await axios.post(`${process.env.VUE_APP_URL}/user/list`);
         if (res.data.success) {
-          this.listUser = res.data.data.filter(
-            (val) => val._id != this.$store.state.user.id
-          );
+          this.listUser = res.data.data.filter((val) => val._id != this.$store.state.user.id);
           this.listUser.forEach((val) => this.$set(val, "online", false));
           console.log("this.user", this.listUser);
         }
@@ -217,12 +157,9 @@ export default {
       try {
         let token = localStorage.getItem("tokenSocket");
         if (token) {
-          let response = await axios.get(
-            `${process.env.VUE_APP_URL}/user/check-token`,
-            {
-              headers: { Authorization: "Bearer " + token },
-            }
-          );
+          let response = await axios.get(`${process.env.VUE_APP_URL}/user/check-token`, {
+            headers: { Authorization: "Bearer " + token },
+          });
           if (response.data.success) {
             let user = {
               name: response.data.data.name,
@@ -274,24 +211,16 @@ export default {
     async fetchConversion() {
       try {
         // let id = this.$store.state.user.id;
-        let res = await axios.get(
-          `${process.env.VUE_APP_URL}/conversion/list/${this.user.id}?search=${this.search}`
-        );
+        let res = await axios.get(`${process.env.VUE_APP_URL}/conversion/list/${this.user.id}?search=${this.search}`);
         // console.log(
         //   `${process.env.VUE_APP_URL}/conversion/list/${this.user.id}`
         // );
         console.log("listConv", res.data);
         if (res.data.success) {
-          this.listConversion = res.data.data.filter(
-            (cvs) => cvs.last_message || cvs.type == "group"
-          );
+          this.listConversion = res.data.data.filter((cvs) => cvs.last_message || cvs.type == "group");
           // this.listConversion = res.data.data;
-          this.listConversion.forEach((val) =>
-            this.$set(this.userActive, val._id, false)
-          );
-          this.listConversion = this.listConversion.sort(
-            (a, b) => b.update_time - a.update_time
-          );
+          this.listConversion.forEach((val) => this.$set(this.userActive, val._id, false));
+          this.listConversion = this.listConversion.sort((a, b) => b.update_time - a.update_time);
           // console.log('ac', this.userActive)
         }
       } catch (error) {
@@ -363,8 +292,6 @@ export default {
   },
 };
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
 ::-webkit-scrollbar {
   width: 5px;
@@ -412,6 +339,7 @@ export default {
   height: 45px;
   overflow: hidden;
   border-radius: 22px;
+  touch-action: none !important;
 }
 
 .chat-list {
@@ -558,5 +486,18 @@ p {
   background-color: gray;
   border-radius: 5px;
   margin-left: auto;
+}
+.wrap-chatlist {
+  position: relative;
+  height: 100%;
+}
+.logout {
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: blue;
+  font-size: 18px;
+  cursor: pointer;
 }
 </style>
